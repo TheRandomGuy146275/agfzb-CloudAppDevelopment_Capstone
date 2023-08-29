@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 # from .restapis import related methods
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from .restapis import get_request, post_request, get_dealers_from_cf, get_dealer_reviews_from_cf
 from datetime import datetime
 import logging
 import json
@@ -93,16 +94,42 @@ def registration_request(request):
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
-    context = {}
     if request.method == "GET":
-        return render(request, 'djangoapp/index.html', context)
-
+        url = "https://mwu0614-3000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
+        # Get dealers from the URL
+        dealerships = get_dealers_from_cf(url)
+        # Concat all dealer's short name
+        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        # Return a list of dealer short name
+        return HttpResponse(dealer_names)
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
-# def get_dealer_details(request, dealer_id):
-# ...
+def get_dealer_details(request, dealer_id):
+    if request.method == "GET":
+        url = "https://mwu0614-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews?id=" + str(dealer_id)
+        reviews = get_dealer_reviews_from_cf(url)
+        dealer_names = ' '.join([dealer.name for dealer in reviews])
+        return HttpResponse(dealer_names)
+
 
 # Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
-# ...
+def add_review(request, dealer_id):
+    if request.method == "POST":
+        # Get username and password from request.POST dictionary
+        username = request.POST['username']
+        password = request.POST['psw']
+        # Try to check if provide credential can be authenticated
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            review = dict()
+            json_payload["review"] = review
+            review["time"] = datetime.utcnow().isoformat()
+            review["dealership"] = 11
+            review["review"] = "This is a great car dealer"
+            result = post_request(url, json_payload, dealerId=dealer_id)
+            return HttpResponse(result)
+        else:
+            return render(request, 'djangoapp/login.html', context)
+    else:
+        return render(request, 'djangoapp/login.html', context)
 
