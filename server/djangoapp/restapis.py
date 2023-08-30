@@ -92,6 +92,10 @@ def get_dealer_reviews_from_cf(url, **kwargs):
                                    name=dealer_review["name"],
                                    purchase=dealer_review["purchase"],
                                    review=dealer_review["review"],
+                                   purchase_date=dealer_review["purchase_date"],
+                                   car_year=dealer_review["car_year"],
+                                   car_make=dealer_review["car_make"],
+                                   car_model=dealer_review["car_model"]
                                    )
             if "id" in dealer_review:
                 review_obj.id = dealer_review["id"]
