@@ -28,10 +28,10 @@ class CarMake(models.Model):
 # - Any other fields you would like to include in car model
 # - __str__ method to print a car make object
 class CarModel(models.Model):
-    car_make = models.ForeignKey(CarMake, null=True, on_delete=models.CASCADE)
+    make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
     name = models.CharField(null=False, max_length=30, default='new car model')
-    dealer_id = models.IntegerField()
-    car_type = models.CharField(null=False, max_length=100, choices=CHOICES)
+    id = models.IntegerField(default=1,primary_key=True)
+    type = models.CharField(null=False, max_length=100, choices=CHOICES)
     year = models.DateField(default=now)
     description = models.CharField(null=False, max_length=500)
     def __str__(self):
@@ -64,15 +64,17 @@ class CarDealer:
 
 # <HINT> Create a plain Python class `DealerReview` to hold review data
 class DealerReview:
-    def __init__(self, dealership, name, purchase, purchase_date, car_year, car_make, car_model, review):
+    def __init__(self, dealership, name, purchase, review, purchase_date, car_make, car_model, car_year, id):
         self.dealership = dealership
         self.name = name
         self.purchase = purchase
-        self.purchase_date = purchase_date
         self.review = review
-        self.car_year = car_year
-        self.car_make = car_make
-        self.car_model = car_model
+        self.purchase_date = ""
+        self.car_make = ""
+        self.car_model = ""
+        self.car_year = ""
+        self.sentiment = ""
+        self.id = ""
         def __str__(self):
             return "Dealer name: " + self.name
 
